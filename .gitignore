@@ -1,0 +1,16 @@
+# Visual Studio specific hidden folders
+.vs/
+*.user
+*.suo
+
+# Compiled Binaries and Cache (CRITICAL TO IGNORE)
+[Bb]in/
+[Oo]bj/
+
+# Publishing and Packaging
+TestResults/
+*.Publish.xml
+
+# Rider / Mac OS cache files (Good practice to include)
+.idea/
+.DS_Store
