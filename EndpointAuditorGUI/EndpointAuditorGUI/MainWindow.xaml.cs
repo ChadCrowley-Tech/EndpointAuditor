@@ -1,9 +1,15 @@
-﻿using System.Windows;
-using System.Windows.Controls.Primitives;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace EndpointAuditorGUI
 {
+    /// <summary>
+    /// Main interaction logic for the EndpointAuditor Dashboard.
+    /// Handles execution of security checks to prevent UI thread blocking.
+    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -11,97 +17,110 @@ namespace EndpointAuditorGUI
             InitializeComponent();
         }
 
-        private void BtnRunAudit_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Triggers the full suite of security audits.
+        /// Uses Task.Run() to ensure the heavy backend PowerShell processes
+        /// do not freeze or stutter the WPF rendersing thread
+        /// </summary>
+        private async void BtnRunAll_Click(object sender, RoutedEventArgs e)
         {
-            // Change button text while running
-            btnRunAudit.Content = "SCANNING...";
-            int secureCount = 0;
+            // Lock the button during execution and provide visual feedback to fit the sidebar width
+            BtnRunAll.IsEnabled = false;
+            BtnRunAll.Content = "SCANNING...";
 
-            // Define binary colors
-            Brush colorSecure = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")); // Emerald Green
-            Brush colorVulnerable = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444")); // Red
+            // Execute all auditing domains
+            await RunNetworkAuditsAsync();
+            await RunExecutionAuditsAsync();
+            await RunIdentityAndHardwareAuditsAsync();
 
-            // Check 1: Windows Defender
-            if (SecurityAuditor.IsDefenderActive())
+            // Unlock and reset the button to its original state
+            BtnRunAll.IsEnabled = true;
+            BtnRunAll.Content = "START AUDIT";
+        }
+        /// <summary>
+        /// Executes Phase 1: Network Vulnerability Checks
+        /// </summary>
+        private async Task RunNetworkAuditsAsync()
+        {
+            bool firewallSecure = await Task.Run(() => SecurityAuditor.AreFirewallsActive());
+            UpdateResultText(TxtFirewall, firewallSecure, "SECURE (Profiles Active)", "VULNERABLE (Profiles Disabled)");
+
+            bool smbv1Secure = await Task.Run(() => SecurityAuditor.IsSMBv1Disabled());
+            UpdateResultText(TxtSMBv1, smbv1Secure, "SECURE (Disabled)", "VULNERABLE (SMBv1 Active)");
+
+            bool llmnrSecure = await Task.Run(() => SecurityAuditor.IsLLMNRDisabled());
+            UpdateResultText(TxtLLMNR, llmnrSecure, "SECURE (Disabled)", "VULNERABLE (Multicast Active)");
+        }
+        /// <summary>
+        /// Executes Phase 2: Execution and Scripting Checks
+        /// </summary>
+        private async Task RunExecutionAuditsAsync()
+        {
+            bool defenderSecure = await Task.Run(() => SecurityAuditor.IsDefenderActive());
+            UpdateResultText(TxtDefender, defenderSecure, "SECURE (Active)", "VULNERABLE (Disabled or Tampered)");
+
+            bool execPolicySecure = await Task.Run(() => SecurityAuditor.IsExecutionPolicySecure());
+            UpdateResultText(TxtExecPolicy, execPolicySecure, "SECURE (Restricted)", "VULNERABLE (Unrestricted)");
+
+            bool scriptLoggingSecure = await Task.Run(() => SecurityAuditor.IsScriptBlockLoggingEnabled());
+            UpdateResultText(TxtScriptLogging, scriptLoggingSecure, "SECURE (Enabled)", "VULNERABLE (Disabled)");
+
+            bool autoRunSecure = await Task.Run(() => SecurityAuditor.IsAutoRunDisabled());
+            UpdateResultText(TxtAutoRun, autoRunSecure, "SECURE (Disabled)", "VULNERABLE (Active)");
+        }
+        /// <summary>
+        /// Executes Phase 3: Identity and Hardware Encrytion Checks
+        /// </summary>
+        private async Task RunIdentityAndHardwareAuditsAsync()
+        {
+            bool uacSecure = await Task.Run(() => SecurityAuditor.IsUACEnabled());
+            UpdateResultText(TxtUAC, uacSecure, "SECURE (LUA Enabled)", "VULNERABLE (LUA Disabled)");
+
+            bool guestSecure = await Task.Run(() => SecurityAuditor.IsGuestAccountDisabled());
+            UpdateResultText(TxtGuest, guestSecure, "SECURE (Disabled)", "VULNERABLE (Active)");
+            
+            // BitLocker returns a nullable boolean to accoumt for OS feature limitations
+            bool? bitLockerSecure = await Task.Run(() => SecurityAuditor.IsBitLockerActive());
+            UpdateNullableResultText(TxtBitLocker, bitLockerSecure, "SECURE (Encrypted)", "VULNERABLE (Unencrypted)", "UNSUPPORTED (OS Limitation)");
+        }
+        /// <summary>
+        /// Helper function to update UI text properties based on standard binary security checks.
+        /// </summary>
+        private void UpdateResultText(TextBlock textBlock, bool isSecure, string secureMessage, string vulnMessage)
+        {
+            // Hex colors matching the Acid Green and Danger Red from the App.xaml palette
+            if (isSecure)
             {
-                statusDefender.Text = "SECURE";
-                statusDefender.Foreground = colorSecure;
-                secureCount++;
+                textBlock.Text = secureMessage;
+                textBlock.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#39FF14");
             }
             else
             {
-                statusDefender.Text = "VULNERABLE";
-                statusDefender.Foreground = colorVulnerable;
+                textBlock.Text = vulnMessage;
+                textBlock.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3366");
             }
+        }
 
-            // Check 2: Firewall Profiles
-            if (SecurityAuditor.AreFirewallsActive())
+        /// <summary>
+        /// Helper function for 3-state (Nullable) checks where features might be unsupported by the OS.
+        /// </summary>
+        private void UpdateNullableResultText(TextBlock textBlock, bool? isSecure, string secureMessage, string vulnMessage, string unsuppMessage)
+        {
+            if (isSecure == true)
             {
-                statusFirewall.Text = "SECURE";
-                statusFirewall.Foreground = colorSecure;
-                secureCount++;
+                textBlock.Text = secureMessage;
+                textBlock.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#39FF14"); // Acid Green
             }
-            else
+            else if (isSecure == false)
             {
-                statusFirewall.Text = "VULNERABLE";
-                statusFirewall.Foreground = colorVulnerable;
+                textBlock.Text = vulnMessage;
+                textBlock.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3366"); // Danger Red
             }
-
-            // Check 3: UAC
-            if (SecurityAuditor.IsUACEnabled())
+            else // It is strictly null, meaning the check is not applicable.
             {
-                statusUAC.Text = "SECURE";
-                statusUAC.Foreground = colorSecure;
-                secureCount++;
+                textBlock.Text = unsuppMessage;
+                textBlock.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#A09DB0"); // Neutral Secondary Grey
             }
-            else
-            {
-                statusUAC.Text = "VULNERABLE";
-                statusUAC.Foreground = colorVulnerable;
-            }
-
-            // Check 4: SMBv1
-            if (SecurityAuditor.IsSMBv1Disabled())
-            {
-                statusSMB.Text = "SECURE";
-                statusSMB.Foreground = colorSecure;
-                secureCount++;
-            }
-            else
-            {
-                statusSMB.Text = "VULNERABLE";
-                statusSMB.Foreground = colorVulnerable;
-            }
-
-            // Check 5: Guest Account
-            if (SecurityAuditor.IsGuestDisabled())
-            {
-                statusGuest.Text = "SECURE";
-                statusGuest.Foreground = colorSecure;
-                secureCount++;
-            }
-            else
-            {
-                statusGuest.Text = "VULNERABLE";
-                statusGuest.Foreground = colorVulnerable;
-            }
-
-            // UPDATE OVERALL POSTURE
-            txtScore.Text = $"{secureCount}/5";
-
-            if (secureCount == 5)
-            {
-                txtOverallStatus.Text = "SECURE";
-                txtOverallStatus.Foreground = colorSecure;
-            }
-            else
-            {
-                txtOverallStatus.Text = "AT RISK";
-                txtOverallStatus.Foreground = colorVulnerable;
-            }
-
-            // Reset button text
-            btnRunAudit.Content = "RE-SCAN";
         }
     }
 }
