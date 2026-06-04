@@ -7,19 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app1.manifest</ApplicationManifest>
-	<EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GUIBackground7.avif" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="EndpointAuditorGUI.slnx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="GUIBackground7.avif" />
+    <None Include="EndpointAuditorGUI.csproj" />
+    <None Include="EndpointAuditorGUI.csproj.user" />
   </ItemGroup>
 
 </Project>
