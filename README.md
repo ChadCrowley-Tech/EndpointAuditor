@@ -32,7 +32,9 @@ Version 3.0 expands the auditing scope to cover ten high-value targets across th
 This application enforces strict **Separation of Concerns** to prevent UI thread blocking during heavy system queries:
 
 **SecurityAuditor.cs:** The standalone backend engine. Handles all business logic, local system queries, and fail-safe try/catch exception handling.
+
 **MainWindow.xaml & App.xaml:** The WPF presentation layer featuring responsive grids, dynamic drop-shadows, and a custom multi-domain color palette.
+
 **MainWindow.xaml.cs:** The bridge leveraging Task.Run() to execute security modules asynchronously, ensuring a highly responsive user experience during scans.
 
 ## 🚀 Deployment & Execution
@@ -46,6 +48,6 @@ This application enforces strict **Separation of Concerns** to prevent UI thread
 
 ## 🗺️ Roadmap
 - **Phase 1:** Minimum Viable Product (CLI Engine) (5 Checks) - *Completed*
-- **Phase 2:** Transition to a polished Graphical User Interface (GUI) dashboard for enhanced usability. - Completed
-- **PHASE 3:** Advanced Asynchronous WPF Dashboard (10 Checks) - Completed
+- **Phase 2:** Transition to a polished Graphical User Interface (GUI) dashboard for enhanced usability. - *Completed*
+- **PHASE 3:** Advanced Asynchronous WPF Dashboard (10 Checks) - *Completed*
 - **PHASE 4:** One-Click Auto-Remediation and CSV Audit Log Export capabilities (15 Checks).
