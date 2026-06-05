@@ -6,9 +6,9 @@
         FontFamily="Consolas">
 
     <Window.Background>
-        <ImageBrush ImageSource="C:\Users\Owner\OneDrive\Pictures\Screenshots\GUIBackground13.jpg" Stretch="Fill" Opacity="0.7" >
+        <ImageBrush ImageSource="C:\Users\Owner\OneDrive\Pictures\Screenshots\GUIBackground20.jfif" Stretch="Fill" Opacity="0.8" >
             <ImageBrush.RelativeTransform>
-                <ScaleTransform ScaleX="1" ScaleY="1.5" CenterY="0.5" CenterX="0.5"/>
+                <ScaleTransform ScaleX="1" ScaleY="1" CenterY="0.5" CenterX="0.5"/>
             </ImageBrush.RelativeTransform>
         </ImageBrush>
     </Window.Background>

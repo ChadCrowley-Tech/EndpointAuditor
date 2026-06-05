@@ -20,7 +20,7 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect Color="#00E5FF" BlurRadius="12" ShadowDepth="0" Opacity="0.6"/>
+                    <DropShadowEffect Color="#00E5FF" BlurRadius="12" ShadowDepth="0" Opacity="0.7"/>
                 </Setter.Value>
             </Setter>
         </Style>
