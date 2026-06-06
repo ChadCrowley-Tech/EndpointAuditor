@@ -6,7 +6,7 @@
         FontFamily="Consolas">
 
     <Window.Background>
-        <ImageBrush ImageSource="C:\Users\Owner\OneDrive\Pictures\Screenshots\GUIBackground20.jfif" Stretch="Fill" Opacity="0.8" >
+        <ImageBrush ImageSource="C:\Users\Owner\OneDrive\Pictures\Screenshots\GUIBackground21.jfif" Stretch="Fill" Opacity="0.8" >
             <ImageBrush.RelativeTransform>
                 <ScaleTransform ScaleX="1" ScaleY="1" CenterY="0.5" CenterX="0.5"/>
             </ImageBrush.RelativeTransform>

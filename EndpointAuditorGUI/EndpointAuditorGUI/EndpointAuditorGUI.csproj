@@ -11,15 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GUIBackground7.avif" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="EndpointAuditorGUI.slnx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="GUIBackground7.avif" />
   </ItemGroup>
 
 </Project>

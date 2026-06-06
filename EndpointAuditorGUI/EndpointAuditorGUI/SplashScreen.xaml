@@ -8,7 +8,7 @@
         FontFamily="Consolas">
 
     <Window.Background>
-        <ImageBrush ImageSource="C:\Users\Owner\OneDrive\Pictures\Screenshots\GUIBackground20.jfif" Stretch="UniformToFill" Opacity="1.0" />
+        <ImageBrush ImageSource="C:\Users\Owner\OneDrive\Pictures\Screenshots\GUIBackground21.jfif" Stretch="UniformToFill" Opacity="1.0" />
     </Window.Background>
 
     <Border CornerRadius="15" BorderBrush="#2D2844" BorderThickness="2" Margin="10">
