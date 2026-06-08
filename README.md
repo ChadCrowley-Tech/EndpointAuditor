@@ -28,6 +28,7 @@ Version 3.0 expands the auditing scope to cover ten high-value targets across th
 10. **BitLocker Encryption:** Verifies primary drive encryption. Implements intelligent OS-edition detection to gracefully bypass the check on unsupported Home editions.
 
 ## 🏗️ Architecture & Asynchronous Design
+![Endpoint Auditor System Architecture](docs/EndpointAuditorArchitecture.png)
 
 This application enforces strict **Separation of Concerns** to prevent UI thread blocking during heavy system queries:
 
